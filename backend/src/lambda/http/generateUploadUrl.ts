@@ -12,12 +12,10 @@ const bucketName = process.env.ATTACHMENT_S3_BUCKET
 export const handler = middy(
     async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
         const todoId = event.pathParameters.todoId
-        //  Return a presigned URL to upload a file for a TODO item with the provided id
+        // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
         const userId = getUserId(event);
-
-        //Check todo exists or not and todo must belong to logged in user 
-        const validTodoId = await todoExists(todoId, userId)
-        if (!validTodoId) {
+        const isValidTodoId = await todoExists(todoId, userId)
+        if (!isValidTodoId) {
             return {
                 statusCode: 404,
                 headers: {
@@ -28,14 +26,10 @@ export const handler = middy(
                 })
             }
         }
-        const attachmentId = uuid.v4();
-
-        //Generate presigned url
-        const uploadUrl = createAttachmentPresignedUrl(attachmentId);
-
-        //Generate attachmentUrl
-        const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${attachmentId}`
-        await updateTodoAttachmentUrl(todoId, userId, attachmentUrl);
+        const attachmentedId = uuid.v4();
+        const uploadedUrl = createAttachmentPresignedUrl(attachmentedId);
+        const attachmentedUrl = `https://${bucketName}.s3.amazonaws.com/${attachmentedId}`
+        await updateTodoAttachmentUrl(todoId, userId, attachmentedUrl);
 
         return {
             statusCode: 200,
@@ -44,7 +38,7 @@ export const handler = middy(
                 'Access-Control-Allow-Credentials': true
             },
             body: JSON.stringify({
-                uploadUrl: uploadUrl
+                uploadUrl: uploadedUrl
             })
         }
     }

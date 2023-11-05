@@ -6,7 +6,10 @@ import {UpdateTodoRequest} from '../requests/UpdateTodoRequest'
 import {createLogger} from '../utils/logger'
 import * as uuid from 'uuid'
 
+// TODO: Implement businessLogic
+
 const logger = createLogger('TodosAccess');
+
 const attachmentUtils = new AttachmentUtils;
 const todoAccess = new TodosAccess()
 
@@ -17,7 +20,7 @@ export async function createTodo(
     logger.info('create todo for user', userId)
     const todoId = uuid.v4()
 
-    logger.info(`Creating todo ${todoId} for user ${userId}`);
+    logger.info(`Create todoId ${todoId}`);
 
     return await todoAccess.createTodo({
         userId,
@@ -41,19 +44,22 @@ export async function deleteTodo(userId: string, todoId: string): Promise<void> 
 }
 
 export async function getTodosForUser(userId: string): Promise<TodoItem[]> {
-    logger.info(`Getting todos for user`);
+    logger.info(`Get todos list`);
 
     return await todoAccess.getAllTodos(userId);
 }
 
 export async function todoExists(todoId: string, userId: string) {
+    logger.info('check todo', todoId)
     return todoAccess.checkExists(todoId, userId);
 }
 
 export function createAttachmentPresignedUrl(attachmentId: string) {
+    logger.info('create attachement', attachmentId)
     return attachmentUtils.generateAttachmentPresignedUrl(attachmentId);
 }
 
 export async function updateTodoAttachmentUrl(todoId: string, userId: string, attachmentUrl: string) {
+    logger.info('update todo attachement', todoId)
     return attachmentUtils.updateTodoAttachmentUrl(todoId, userId, attachmentUrl);
 }
