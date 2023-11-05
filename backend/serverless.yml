@@ -1,3 +1,5 @@
+org: psybinh
+app: todoapp
 service:
   name: uda-todo-app
 
