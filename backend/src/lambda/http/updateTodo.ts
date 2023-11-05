@@ -4,7 +4,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
-import { updateTodo } from '../../businessLogic/todos'
+import { updateTodo } from '../../helpers/todos'
 import { getToken } from '../../auth/utils'
 import { createLogger } from '../../utils/logger'
 

@@ -3,7 +3,7 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 
-import { deleteTodo } from '../../businessLogic/todos'
+import { deleteTodo } from '../../helpers/todos'
 import { getToken } from '../../auth/utils'
 import { createLogger } from '../../utils/logger'
 

@@ -3,7 +3,7 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 
-import { generateUploadUrl } from '../../businessLogic/todos'
+import { generateUploadUrl } from '../../helpers/todos'
 import { createLogger } from '../../utils/logger'
 
 const logger = createLogger('update-todo')

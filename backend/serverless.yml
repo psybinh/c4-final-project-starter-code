@@ -1,3 +1,5 @@
+org: psybinh
+app: todoapp
 service:
   name: serverless-todo-app
 
