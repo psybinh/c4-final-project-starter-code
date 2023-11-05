@@ -1,54 +1,75 @@
-import * as uuid from 'uuid';
-import * as AWS from 'aws-sdk';
-import { TodoAccess } from '../dataLayer/todoAccess';
-import { getUserId } from '../utils/getJwt';
-import { TodoItem, TodoCreate, TodoUpdate } from '../models/Todo.d';
+import * as uuid from 'uuid'
 
-const todoAccess = new TodoAccess();
+import { TodoItem } from '../models/TodoItem'
+import { TodoAccess } from '../dataLayer/todoAccess'
+import { CreateTodoRequest } from '../requests/CreateTodoRequest'
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
+import { parseUserId } from '../auth/utils'
+import { createLogger } from '../utils/logger'
 
-export async function getTodos(jwtToken: string): Promise<TodoItem[]> {
-  const userId: string = getUserId(jwtToken);
-  return todoAccess.getTodos(userId);
+const logger = createLogger('todos')
+
+const todoAccess = new TodoAccess()
+
+export const getAllTodos = async (jwtToken: string): Promise<TodoItem[]> => {
+  const userId = parseUserId(jwtToken)
+
+  return await todoAccess.getAllTodos(userId)
 }
 
-export async function getTodo(jwtToken: string, todoId: string): Promise<TodoItem> {
-  const userId: string = getUserId(jwtToken);
-  return todoAccess.getTodo(userId, todoId);
+export const createTodo = async (
+  createTodoRequest: CreateTodoRequest,
+  jwtToken: string
+): Promise<TodoItem> => {
+  logger.info('In createTodo() function')
+
+  const itemId = uuid.v4()
+  const userId = parseUserId(jwtToken)
+
+  return await todoAccess.createTodo({
+    todoId: itemId,
+    userId,
+    name: createTodoRequest.name,
+    dueDate: createTodoRequest.dueDate,
+    done: false,
+    createdAt: new Date().toISOString()
+  })
 }
 
-export async function createTodo(jwtToken: string, newTodoData: TodoCreate): Promise<TodoItem> {
-  const todoId = uuid.v4();
-  const userId = getUserId(jwtToken);
-  const createdAt = new Date().toISOString();
-  const done = false;
-  const newTodo: TodoItem = { todoId, userId, createdAt, done, ...newTodoData };
-  return todoAccess.createTodo(newTodo);
-}
-
-export async function updateTodo(
-  jwtToken: string,
+export const updateTodo = async (
   todoId: string,
-  updateData: TodoUpdate
-): Promise<void> {
-  const userId = getUserId(jwtToken);
-  return todoAccess.updateTodo(userId, todoId, updateData);
+  updateTodoRequest: UpdateTodoRequest,
+  jwtToken: string
+): Promise<TodoItem> => {
+  logger.info('In updateTodo() function')
+
+  const userId = parseUserId(jwtToken)
+  logger.info('User Id: ' + userId)
+
+  return await todoAccess.updateTodo({
+    todoId,
+    userId,
+    name: updateTodoRequest.name,
+    dueDate: updateTodoRequest.dueDate,
+    done: updateTodoRequest.done,
+    createdAt: new Date().toISOString()
+  })
 }
 
-export async function deleteTodo(jwtToken: string, todoId: string): Promise<void> {
-  const userId = getUserId(jwtToken);
-  return todoAccess.deleteTodo(userId, todoId);
+export const deleteTodo = async (
+  todoId: string,
+  jwtToken: string
+): Promise<string> => {
+  logger.info('In deleteTodo() function')
+
+  const userId = parseUserId(jwtToken)
+  logger.info('User Id: ' + userId)
+
+  return await todoAccess.deleteTodo(todoId, userId)
 }
 
-export async function generateUploadUrl(jwtToken: string, todoId: string): Promise<string> {
-  const userId = getUserId(jwtToken);
-  const bucketName = process.env.IMAGES_S3_BUCKET;
-  const urlExpiration = parseInt(process.env.SIGNED_URL_EXPIRATION, 10);
-  const s3 = new AWS.S3({ signatureVersion: 'v4' });
-  const signedUrl = s3.getSignedUrl('putObject', {
-    Bucket: bucketName,
-    Key: todoId,
-    Expires: urlExpiration
-  });
-  await todoAccess.saveImgUrl(userId, todoId, bucketName);
-  return signedUrl;
+export const generateUploadUrl = async (todoId: string): Promise<string> => {
+  logger.info('In generateUploadUrl() function')
+
+  return await todoAccess.generateUploadUrl(todoId)
 }

@@ -1,38 +1,40 @@
-import 'source-map-support/register';
-import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
-import { updateTodo } from '../../businessLogic/todos';
-import { TodoUpdate } from '../../models/Todo.d';
-import { createLogger } from '../../utils/logger';
-import { getToken } from '../../utils/getJwt';
+import 'source-map-support/register'
 
-const logger = createLogger('updateTodo');
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import * as middy from 'middy'
 
-export const handler: APIGatewayProxyHandler = async (
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
-  logger.info('Processing UpdateTodo event...');
-  const jwtToken: string = getToken(event);
-  const todoId = event.pathParameters.todoId;
-  const updateData: TodoUpdate = JSON.parse(event.body);
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Credentials': true
-  };
+import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
+import { updateTodo } from '../../businessLogic/todos'
+import { getToken } from '../../auth/utils'
+import { createLogger } from '../../utils/logger'
 
-  try {
-    await updateTodo(jwtToken, todoId, updateData);
-    logger.info(`Successfully updated the todo item: ${todoId}`);
-    return {
-      statusCode: 204,
-      headers,
-      body: undefined
-    };
-  } catch (error) {
-    logger.error(`Error: ${error.message}`);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error })
-    };
+const logger = createLogger('update-todo')
+
+export const handler = middy(
+  async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    try {
+      const todoId: string = event.pathParameters.todoId
+      const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
+
+      const jwtToken: string = getToken(event.headers.Authorization)
+
+      await updateTodo(todoId, updatedTodo, jwtToken)
+
+      return {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': true
+        },
+        body: ''
+      }
+    } catch (e) {
+      logger.error('Error', { error: e.message })
+
+      return {
+        statusCode: 500,
+        body: e.message
+      }
+    }
   }
-};
+)
