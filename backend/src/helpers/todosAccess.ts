@@ -8,7 +8,6 @@ const AWSXRay = require('aws-xray-sdk');
 const XAWS = AWSXRay.captureAWS(AWS);
 const logger = createLogger('TodosAccess')
 
-// TODO excute by ThienNLNT - 24-10: Implement the dataLayer logic
 export class TodosAccess {
     constructor(
         private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),

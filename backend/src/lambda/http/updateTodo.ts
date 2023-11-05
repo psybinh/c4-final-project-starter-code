@@ -12,7 +12,7 @@ export const handler = middy(
     async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
         const todoId = event.pathParameters.todoId
         const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
-        // TODO excute by ThienNLNT - 24-10: Update a TODO item with the provided id using values in the "updatedTodo" object
+        //  Update a TODO item with the provided id using values in the "updatedTodo" object
         const userId = getUserId(event);
 
         //Check todo exists or not and todo must belong to logged in user

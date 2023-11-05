@@ -14,13 +14,7 @@ import {
   Loader
 } from 'semantic-ui-react'
 
-import {
-  createTodo,
-  deleteTodo,
-  getTodos,
-  patchTodo,
-  checkAttachmentURL
-} from '../api/todos-api'
+import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
 import Auth from '../auth/Auth'
 import { Todo } from '../types/Todo'
 
@@ -70,7 +64,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     try {
       await deleteTodo(this.props.auth.getIdToken(), todoId)
       this.setState({
-        todos: this.state.todos.filter((todo) => todo.todoId != todoId)
+        todos: this.state.todos.filter(todo => todo.todoId !== todoId)
       })
     } catch {
       alert('Todo deletion failed')
@@ -91,53 +85,26 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         })
       })
     } catch {
-      alert('Todo update failed')
-    }
-  }
-
-  onCheckAttachmentURL = async (todo: Todo, pos: number): Promise<boolean> => {
-    try {
-      const response = todo.attachmentUrl
-        ? await checkAttachmentURL(todo.attachmentUrl)
-        : false
-
-      this.setState({
-        todos: update(this.state.todos, {
-          [pos]: { validUrl: { $set: response } }
-        })
-      })
-
-      return true
-    } catch {
-      return false
+      alert('Todo deletion failed')
     }
   }
 
   async componentDidMount() {
     try {
       const todos = await getTodos(this.props.auth.getIdToken())
-
       this.setState({
         todos,
         loadingTodos: false
       })
-
-      this.state.todos.map(async (todo, pos) => {
-        todo['validUrl'] = todo.attachmentUrl
-          ? await this.onCheckAttachmentURL(todo, pos)
-          : false
-
-        return todo
-      })
     } catch (e) {
-      alert(`Failed to fetch todos: ${e.message}`)
+      alert(`Failed to fetch todos: ${(e as Error).message}`)
     }
   }
 
   render() {
     return (
       <div>
-        <Header as="h1">TODOs List</Header>
+        <Header as="h1">TODOs</Header>
 
         {this.renderCreateTodoInput()}
 
@@ -160,7 +127,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
             }}
             fluid
             actionPosition="left"
-            placeholder="What do you want done?"
+            placeholder="To change the world..."
             onChange={this.handleNameChange}
           />
         </Grid.Column>
@@ -201,15 +168,12 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   checked={todo.done}
                 />
               </Grid.Column>
-
               <Grid.Column width={10} verticalAlign="middle">
                 {todo.name}
               </Grid.Column>
-
               <Grid.Column width={3} floated="right">
                 {todo.dueDate}
               </Grid.Column>
-
               <Grid.Column width={1} floated="right">
                 <Button
                   icon
@@ -219,7 +183,6 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   <Icon name="pencil" />
                 </Button>
               </Grid.Column>
-
               <Grid.Column width={1} floated="right">
                 <Button
                   icon
@@ -229,11 +192,9 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   <Icon name="delete" />
                 </Button>
               </Grid.Column>
-
-              {todo.attachmentUrl && todo.validUrl ? (
+              {todo.attachmentUrl && (
                 <Image src={todo.attachmentUrl} size="small" wrapped />
-              ) : null}
-
+              )}
               <Grid.Column width={16}>
                 <Divider />
               </Grid.Column>

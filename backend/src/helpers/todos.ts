@@ -6,7 +6,6 @@ import {UpdateTodoRequest} from '../requests/UpdateTodoRequest'
 import {createLogger} from '../utils/logger'
 import * as uuid from 'uuid'
 
-// TODO excute by ThienNLNT - 24-10: Implement businessLogic
 const logger = createLogger('TodosAccess');
 const attachmentUtils = new AttachmentUtils;
 const todoAccess = new TodosAccess()

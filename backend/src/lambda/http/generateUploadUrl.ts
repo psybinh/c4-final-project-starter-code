@@ -12,10 +12,10 @@ const bucketName = process.env.ATTACHMENT_S3_BUCKET
 export const handler = middy(
     async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
         const todoId = event.pathParameters.todoId
-        // TODO excute by ThienNLNT - 24-10: Return a presigned URL to upload a file for a TODO item with the provided id
+        //  Return a presigned URL to upload a file for a TODO item with the provided id
         const userId = getUserId(event);
 
-        //Check todo exists or not and todo must belong to logged in user TODO excute by ThienNLNT - 24-10:
+        //Check todo exists or not and todo must belong to logged in user 
         const validTodoId = await todoExists(todoId, userId)
         if (!validTodoId) {
             return {

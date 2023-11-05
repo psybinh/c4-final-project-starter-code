@@ -3,7 +3,6 @@ import * as AWS from 'aws-sdk'
 const AWSXRay = require('aws-xray-sdk')
 const XAWS = AWSXRay.captureAWS(AWS)
 
-// TODO excute by ThienNLNT - 24-10: Implement the fileStogare logic
 export class AttachmentUtils {
 
     constructor(
