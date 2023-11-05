@@ -1,75 +1,60 @@
+import {TodosAccess} from '../helpers/todosAccess'
+import {AttachmentUtils} from '../helpers/attachmentUtils';
+import {TodoItem} from '../models/TodoItem'
+import {CreateTodoRequest} from '../requests/CreateTodoRequest'
+import {UpdateTodoRequest} from '../requests/UpdateTodoRequest'
+import {createLogger} from '../utils/logger'
 import * as uuid from 'uuid'
 
-import { TodoItem } from '../models/TodoItem'
-import { TodoAccess } from '../helpers/todoAccess'
-import { CreateTodoRequest } from '../requests/CreateTodoRequest'
-import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-import { parseUserId } from '../auth/utils'
-import { createLogger } from '../utils/logger'
+// TODO excute by ThienNLNT - 24-10: Implement businessLogic
+const logger = createLogger('TodosAccess');
+const attachmentUtils = new AttachmentUtils;
+const todoAccess = new TodosAccess()
 
-const logger = createLogger('todos')
+export async function createTodo(
+    userId: string,
+    createTodoRequest: CreateTodoRequest
+): Promise<TodoItem> {
+    logger.info('create todo for user', userId)
+    const todoId = uuid.v4()
 
-const todoAccess = new TodoAccess()
+    logger.info(`Creating todo ${todoId} for user ${userId}`);
 
-export const getAllTodos = async (jwtToken: string): Promise<TodoItem[]> => {
-  const userId = parseUserId(jwtToken)
-
-  return await todoAccess.getAllTodos(userId)
+    return await todoAccess.createTodo({
+        userId,
+        todoId,
+        createdAt: new Date().toISOString(),
+        ...createTodoRequest
+    } as TodoItem)
 }
 
-export const createTodo = async (
-  createTodoRequest: CreateTodoRequest,
-  jwtToken: string
-): Promise<TodoItem> => {
-  logger.info('In createTodo() function')
-
-  const itemId = uuid.v4()
-  const userId = parseUserId(jwtToken)
-
-  return await todoAccess.createTodo({
-    todoId: itemId,
-    userId,
-    name: createTodoRequest.name,
-    dueDate: createTodoRequest.dueDate,
-    done: false,
-    createdAt: new Date().toISOString()
-  })
+export async function updateTodo(
+    todoId: string,
+    userId: string,
+    todoUpdate: UpdateTodoRequest
+): Promise<void> {
+    return await todoAccess.updateTodo(todoId, userId, todoUpdate);
 }
 
-export const updateTodo = async (
-  todoId: string,
-  updateTodoRequest: UpdateTodoRequest,
-  jwtToken: string
-): Promise<TodoItem> => {
-  logger.info('In updateTodo() function')
-
-  const userId = parseUserId(jwtToken)
-  logger.info('User Id: ' + userId)
-
-  return await todoAccess.updateTodo({
-    todoId,
-    userId,
-    name: updateTodoRequest.name,
-    dueDate: updateTodoRequest.dueDate,
-    done: updateTodoRequest.done,
-    createdAt: new Date().toISOString()
-  })
+export async function deleteTodo(userId: string, todoId: string): Promise<void> {
+    logger.info('delete todo', todoId)
+    return await todoAccess.deleteTodo(userId, todoId)
 }
 
-export const deleteTodo = async (
-  todoId: string,
-  jwtToken: string
-): Promise<string> => {
-  logger.info('In deleteTodo() function')
+export async function getTodosForUser(userId: string): Promise<TodoItem[]> {
+    logger.info(`Getting todos for user`);
 
-  const userId = parseUserId(jwtToken)
-  logger.info('User Id: ' + userId)
-
-  return await todoAccess.deleteTodo(todoId, userId)
+    return await todoAccess.getAllTodos(userId);
 }
 
-export const generateUploadUrl = async (todoId: string): Promise<string> => {
-  logger.info('In generateUploadUrl() function')
+export async function todoExists(todoId: string, userId: string) {
+    return todoAccess.checkExists(todoId, userId);
+}
 
-  return await todoAccess.generateUploadUrl(todoId)
+export function createAttachmentPresignedUrl(attachmentId: string) {
+    return attachmentUtils.generateAttachmentPresignedUrl(attachmentId);
+}
+
+export async function updateTodoAttachmentUrl(todoId: string, userId: string, attachmentUrl: string) {
+    return attachmentUtils.updateTodoAttachmentUrl(todoId, userId, attachmentUrl);
 }
