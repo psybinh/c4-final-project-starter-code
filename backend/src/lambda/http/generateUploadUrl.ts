@@ -4,7 +4,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 
-import { createAttachmentPresignedUrl, todoExists, updateTodoAttachmentUrl } from '../../helpers/todos'
+import { createAttachmentPresignedUrl, todoExists, updateTodoAttachmentUrl } from '../../bussinessLayer/todos'
 import { getUserId } from '../utils'
 import * as uuid from 'uuid'
 const bucketName = process.env.ATTACHMENT_S3_BUCKET

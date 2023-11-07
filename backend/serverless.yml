@@ -28,25 +28,8 @@ provider:
     PROJECT_NAME: serverless-to-do-app
     INDEX_NAME: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
 
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - s3:PutObject
-        - s3:GetObject
-      Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*
-
   logs:
     restApi: true
-
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - xray:PutTelemetryRecords
-            - xray:PutTraceSegments
-          Resource: "*"
-
 
 functions:
 
