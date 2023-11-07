@@ -2,27 +2,29 @@ import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
-import { cors } from 'middy/middlewares'
-
-import { deleteTodo } from '../../helpers/todos'
+import { cors, httpErrorHandler } from 'middy/middlewares'
+import { deleteTodo } from '../../bussinessLayer/todos'
 import { getUserId } from '../utils'
 
 export const handler = middy(
-    async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-        const todoId = event.pathParameters.todoId
-        //  Remove a TODO item by id
-        const userId = getUserId(event)
-        await deleteTodo(userId, todoId)
+  async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    const todoId: string = event.pathParameters.todoId
+    const userId: string = getUserId(event);
 
-        return {
-            statusCode: 204,
-            body: ''
-        }
-    }
+    await deleteTodo(todoId, userId);
+    
+    return {
+      statusCode: 200,
+      body: ""
+    };
+
+  }
 )
 
-handler.use(
+handler
+  .use(httpErrorHandler())
+  .use(
     cors({
-        credentials: true
+      credentials: true
     })
-)
+  )

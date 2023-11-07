@@ -1,12 +1,9 @@
-# package directories TODO excute by ThienNLNT - 24-10:
+# package directories
 node_modules
 jspm_packages
 
-# Serverless directories TODO excute by ThienNLNT - 24-10:
+# Serverless directories
 .serverless
 
-# Webpack directories TODO excute by ThienNLNT - 24-10:
-.webpack
-
-# Local DynamoDb TODO excute by ThienNLNT - 24-10:
-.dynamodb
+# esbuild directories
+.esbuild
